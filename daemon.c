@@ -1,7 +1,11 @@
+#include <errno.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+
 int
 main(int argc, char** argv) {
 	if (argc == 1) {
@@ -11,11 +15,16 @@ main(int argc, char** argv) {
 
 	// Throws out the first argument
 	// This is the only good thing about arrays being the same as pointers
+	// in c
 	argv++;
 
 	int child_pid = fork();
 
 	if (child_pid == 0) {
+
+		// Clone stderr in the *rare* event exec fails.
+		fcntl(2, F_DUPFD_CLOEXEC, 3);
+
 		close(0);
 		close(1);
 		close(2);
@@ -26,8 +35,10 @@ main(int argc, char** argv) {
 		dup(0);
 
 		execvp(argv[0], argv);
-		// AAAAAAAAAAA
-		// EXEC FAILED!
+
+		// Exec failed, report this
+		FILE* errclone = fdopen(3, "w");
+		fprintf(errclone, "Exec failed!\nReason: %s\n", strerror(errno));
 		return EXIT_FAILURE;
 	} else if (child_pid < 0) {
 		fprintf(stderr, "AAAAAAAA\nfork failed!!!!\n");
