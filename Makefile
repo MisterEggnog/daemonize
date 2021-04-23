@@ -4,7 +4,8 @@ BIN=daemonize
 all: $(BIN)
 
 $(BIN): daemon.c
-	gcc -Wall -g -o $@ $^
+	$(CC) -Wall -g -o $@ $^
 
-test: $(BIN)
-	./$(BIN) nothing.sh
+release: daemon.c
+	$(CC) -Wall -O3 -o $(BIN) $^
+	strip $(BIN)
