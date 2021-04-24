@@ -9,3 +9,6 @@ $(BIN): daemon.c
 release: daemon.c
 	$(CC) -Wall -O3 -o $(BIN) $^
 	strip $(BIN)
+
+clean:
+	$(RM) $(BIN)
