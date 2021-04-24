@@ -25,6 +25,9 @@ main(int argc, char** argv) {
 		// Clone stderr in the *rare* event exec fails.
 		fcntl(2, F_DUPFD_CLOEXEC, 3);
 
+		// cd /
+		chdir("/");
+
 		close(0);
 		close(1);
 		close(2);
