@@ -23,7 +23,7 @@ main(int argc, char** argv) {
 	if (child_pid == 0) {
 
 		// Clone stderr in the *rare* event exec fails.
-		fcntl(2, F_DUPFD_CLOEXEC, 3);
+		int err_fd = fcntl(2, F_DUPFD_CLOEXEC, 3);
 
 		// cd /
 		chdir("/");
@@ -40,7 +40,7 @@ main(int argc, char** argv) {
 		execvp(argv[0], argv);
 
 		// Exec failed, report this
-		FILE* errclone = fdopen(3, "w");
+		FILE* errclone = fdopen(err_fd, "w");
 		fprintf(errclone, "Exec failed!\nReason: %s\n", strerror(errno));
 		return EXIT_FAILURE;
 	} else if (child_pid < 0) {
